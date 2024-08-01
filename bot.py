@@ -2,14 +2,13 @@ from telethon import TelegramClient, events
 import re
 from datetime import datetime
 import random
-from random_address import real_random_address
 import names
-from defs import getUrl, getcards, phone
+from random_address import real_random_address
 
 api_id = '21612966'
 api_hash = '5bbd3c5d584a7f443e0f20625652a3ad'
 source_chat_id = -1002152890891
-target_user_id = -1002041615765
+target_user_id = -1002041615765  # Replace with actual target user ID
 
 client = TelegramClient('user', api_id, api_hash)
 
@@ -22,11 +21,11 @@ message_count = 0
 hour_start_time = datetime.now()
 
 def generate_random_details(country, cc, mes, ano, cvv):
-    addr = real_random_address() if country.lower() == 'united states of america' else real_random_address(country=country)
+    addr = real_random_address(country=country) if country.lower() != 'united states of america' else real_random_address()
 
     fullinfo = (
         f"{cc}|{mes}|{ano}|{cvv}|{names.get_full_name()}|{addr['address1']}|"
-        f"{addr['city']}|{addr['state']}|{addr['postalCode']}|{phone()}|"
+        f"{addr['city']}|{addr['state']}|{addr['postalCode']}|"
         f"dob: {datetime.strftime(datetime(random.randint(1960, 2005), random.randint(1, 12), random.randint(1, 28)), '%Y-%m-%d')}|{country}"
     )
     return fullinfo
@@ -87,8 +86,8 @@ async def handler(event):
             await client.send_message(target_user_id, formatted_message)
             last_sent_time = current_time
             message_count += 1
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Failed to send message: {e}")
     elif message_count >= MAX_MESSAGES_PER_HOUR:
         pass
     else:
